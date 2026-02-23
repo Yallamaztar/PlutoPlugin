@@ -37,7 +37,8 @@ func RunEventTailLoop(index int, cfg *config.Config, rcon *rcon.RCON, reg *regis
 			case "J":
 				go func() {
 					reg.SetClientNum(event.XUID, event.ClientNum)
-					guid := rcon.PlayerGUIDByClientNum(event.ClientNum)
+
+					guid := rcon.GUIDByClientNum(event.ClientNum)
 					if guid == "" {
 						return
 					}
@@ -65,8 +66,8 @@ func RunEventTailLoop(index int, cfg *config.Config, rcon *rcon.RCON, reg *regis
 					if err != nil {
 						return
 					}
-					log.Printf("Created wallet: %s (%s) | ID: %d\n", event.Name, event.XUID, id)
 
+					log.Printf("Created wallet: %s (%s) | ID: %d\n", event.Name, event.XUID, id)
 					rcon.Tell(
 						event.ClientNum,
 						fmt.Sprintf(

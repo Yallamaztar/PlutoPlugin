@@ -68,4 +68,59 @@ func RegisterClientCommands(
 			rcon.Say(fmt.Sprintf("%s just ^6won ^7%s%d!", p.Name, cfg.Gambling.Currency, res.Amount))
 		},
 	})
+
+	reg.RegisterCommand(register.Command{
+		Name:     "pay",
+		Aliases:  []string{"pp", "payplayer", "transfer"},
+		MinLevel: LevelUser,
+		Help:     "Usage: ^6!pay <player> <amount>",
+		MinArgs:  2,
+		Handler:  func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {},
+	})
+
+	reg.RegisterCommand(register.Command{
+		Name:     "balance",
+		Aliases:  []string{"bal", "balanc", "money"},
+		MinLevel: LevelUser,
+		Help:     "Usage: ^6!balance <player>",
+		MinArgs:  1,
+		Handler:  func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {},
+	})
+
+	reg.RegisterCommand(register.Command{
+		Name:     "discord",
+		Aliases:  []string{"dc", "disc"},
+		MinLevel: LevelUser,
+		Help:     "Usage: ^6!discord",
+		MinArgs:  1,
+		Handler:  func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {},
+	})
+
+	reg.RegisterCommand(register.Command{
+		Name:     "richest",
+		Aliases:  []string{"rich"},
+		MinLevel: LevelUser,
+		Help:     "Usage: ^6!richest",
+		MinArgs:  1,
+		Handler:  func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {},
+	})
+
+	reg.RegisterCommand(register.Command{
+		Name:     "poorest",
+		Aliases:  []string{"poor"},
+		MinLevel: LevelUser,
+		Help:     "Usage: ^6!poorest",
+		MinArgs:  1,
+		Handler:  func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {},
+	})
+
+	reg.RegisterCommand(register.Command{
+		Name:     "bankbalance",
+		Aliases:  []string{"bb", "bank", "bankbal"},
+		MinLevel: LevelUser,
+		Help:     "Usage: ^6!bankbalance",
+		MinArgs:  1,
+		Handler:  func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {},
+	})
+
 }

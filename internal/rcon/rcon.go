@@ -240,7 +240,7 @@ func (r *RCON) SayRaw(message string) error {
 	return r.sendPacket(packet)
 }
 
-func (r *RCON) PlayerGUIDByClientNum(clientNum uint8) string {
+func (r *RCON) GUIDByClientNum(clientNum uint8) string {
 	status, err := r.Status()
 	if err != nil {
 		return ""
@@ -253,4 +253,19 @@ func (r *RCON) PlayerGUIDByClientNum(clientNum uint8) string {
 	}
 
 	return ""
+}
+
+func (r *RCON) ClientNumByGUID(guid string) int {
+	status, err := r.Status()
+	if err != nil {
+		return -1
+	}
+
+	for _, p := range status.Players {
+		if p.GUID == guid {
+			return p.ClientNum
+		}
+	}
+
+	return -1
 }
