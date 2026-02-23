@@ -117,7 +117,7 @@ func RegisterClientCommands(
 		Handler: func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {
 			bal, err := wallet.GetBalance(playerID)
 			if err != nil {
-				rcon.Tell(clientNum, "error occurred, please try again later")
+				rcon.Tell(clientNum, unknownErr)
 				return
 			}
 
@@ -134,7 +134,7 @@ func RegisterClientCommands(
 		Handler: func(clientNum uint8, playerID int, playerName, xuid string, level int, args []string) {
 			bal, err := bank.GetBalance()
 			if err != nil {
-				rcon.Tell(clientNum, "error occurred, please try again later")
+				rcon.Tell(clientNum, unknownErr)
 				return
 			}
 
