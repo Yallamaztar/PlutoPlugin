@@ -25,8 +25,10 @@ func Gamble(
 	player *player.Service,
 	wallet *wallet.Service,
 	bank *bank.Service,
+
 	playerStats *stats.PlayeStatsService,
 	gambleStats *stats.GamblingStatsService,
+	walletStats *stats.WalletStatsService,
 ) (*Result, error) {
 	if amount <= 0 {
 		return nil, errors.New("invalid gamble amount")
@@ -58,6 +60,7 @@ func Gamble(
 
 		_ = playerStats.Win(playerID, bet, bet*2)
 		_ = gambleStats.RecordGamble(bet, bet*2)
+		_ = walletStats.Deposit(playerID, bet)
 
 		return &Result{
 			Won:     true,
@@ -77,6 +80,7 @@ func Gamble(
 
 	_ = playerStats.Loss(playerID, bet)
 	_ = gambleStats.RecordGamble(bet, 0)
+	_ = walletStats.Withdraw(playerID, bet)
 
 	return &Result{
 		Won:     false,

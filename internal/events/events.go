@@ -10,12 +10,24 @@ import (
 	"strings"
 
 	ps "plugin/internal/service/player"
+	ss "plugin/internal/service/stats"
 	ws "plugin/internal/service/wallet"
 
 	"github.com/Yallamaztar/eventsv2/events"
 )
 
-func RunEventTailLoop(index int, cfg *config.Config, rcon *rcon.RCON, reg *register.Register, playerService *ps.Service, walletService *ws.Service, log *logger.Logger) {
+func RunEventTailLoop(
+	index int,
+	cfg *config.Config,
+	rcon *rcon.RCON,
+	reg *register.Register,
+
+	playerService *ps.Service,
+	walletService *ws.Service,
+	walletStats *ss.WalletStatsService,
+
+	log *logger.Logger,
+) {
 	eventsCh := make(chan events.Event, 128)
 	server := cfg.Server[index]
 	go func(cfg *config.Config) {
@@ -47,6 +59,7 @@ func RunEventTailLoop(index int, cfg *config.Config, rcon *rcon.RCON, reg *regis
 					if err != nil {
 						return
 					}
+
 					if exists {
 						p, err := playerService.GetPlayerByXUID(event.XUID)
 						if err != nil {
@@ -54,6 +67,7 @@ func RunEventTailLoop(index int, cfg *config.Config, rcon *rcon.RCON, reg *regis
 						}
 
 						walletService.Deposit(p.ID, int(cfg.Economy.JoinReward))
+						walletStats.Deposit(p.ID, int(cfg.Economy.JoinReward))
 						return
 					}
 
@@ -62,10 +76,14 @@ func RunEventTailLoop(index int, cfg *config.Config, rcon *rcon.RCON, reg *regis
 						return
 					}
 
-					err = walletService.CreateWallet(int(id), int(cfg.Economy.FirstTimeReward))
+					err = walletService.CreateWallet(id, int(cfg.Economy.FirstTimeReward))
 					if err != nil {
+						playerService.DeletePlayer(id)
 						return
 					}
+
+					walletStats.Init(id)
+					walletStats.Deposit(id, int(cfg.Economy.FirstTimeReward))
 
 					log.Printf("Created wallet: %s (%s) | ID: %d\n", event.Name, event.XUID, id)
 					rcon.Tell(

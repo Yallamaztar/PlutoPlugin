@@ -46,6 +46,7 @@ func main() {
 	bank := bs.New(br.New(db))
 	playerStats := ss.NewPlayerStats(sr.NewPlayerStats(db))
 	gambleStats := ss.NewGamblingStats(sr.NewGamblingStats(db))
+	walletStats := ss.NewWalletStats(sr.NewWalletStats(db))
 	log.Println("Database migrations done!")
 
 	var wg sync.WaitGroup
@@ -59,7 +60,7 @@ func main() {
 		}
 
 		reg := register.New(*cfg, rc, player)
-		commands.RegisterClientCommands(*cfg, rc, reg, player, wallet, bank, playerStats, gambleStats)
+		commands.RegisterClientCommands(*cfg, rc, reg, player, wallet, bank, playerStats, gambleStats, walletStats)
 
 		serverLog.Println("Starting Plugin")
 		wg.Add(1)
@@ -67,7 +68,7 @@ func main() {
 			defer wg.Done()
 			defer rc.Close()
 
-			events.RunEventTailLoop(i, cfg, rc, reg, player, wallet, log)
+			events.RunEventTailLoop(i, cfg, rc, reg, player, wallet, walletStats, log)
 		}(rc, serverLog)
 	}
 

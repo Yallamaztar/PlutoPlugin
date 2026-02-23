@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"plugin/internal/config"
 	"plugin/internal/service/player"
+	"plugin/internal/service/stats"
 	"plugin/internal/service/wallet"
 )
 
@@ -25,11 +26,9 @@ func Pay(
 	cfg config.Config,
 	player *player.Service,
 	wallet *wallet.Service,
-) (*Result, error) {
-	if fromPlayerID == toPlayerID {
-		return nil, errors.New("you cannot pay yourself")
-	}
+	walletStats *stats.WalletStatsService,
 
+) (*Result, error) {
 	if amount <= 0 {
 		return nil, errors.New("invalid amount")
 	}
@@ -64,6 +63,9 @@ func Pay(
 	if err != nil {
 		return nil, err
 	}
+
+	walletStats.Pay(fromPlayerID, amount)
+	walletStats.Receive(toPlayerID, amount)
 
 	return &Result{
 		FromPlayer:  fromPlayerID,
