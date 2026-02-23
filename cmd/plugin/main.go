@@ -58,7 +58,7 @@ func main() {
 			continue
 		}
 
-		reg := register.New(*cfg, rc)
+		reg := register.New(*cfg, rc, player)
 		commands.RegisterClientCommands(*cfg, rc, reg, player, wallet, bank, playerStats, gambleStats)
 
 		serverLog.Println("Starting Plugin")

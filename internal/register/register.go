@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"plugin/internal/config"
 	"plugin/internal/rcon"
+	"plugin/internal/service/player"
 	"strings"
 	"sync"
 )
@@ -33,19 +34,21 @@ type Register struct {
 	commands commands
 	clients  clients
 
-	rc  *rcon.RCON
-	cfg config.Config
+	rc      *rcon.RCON
+	cfg     config.Config
+	players *player.Service
 
 	mu sync.RWMutex
 }
 
-func New(cfg config.Config, rc *rcon.RCON) *Register {
+func New(cfg config.Config, rc *rcon.RCON, players *player.Service) *Register {
 	return &Register{
 		commands: make(commands),
 		clients:  make(clients),
 
-		rc:  rc,
-		cfg: cfg,
+		rc:      rc,
+		cfg:     cfg,
+		players: players,
 
 		mu: sync.RWMutex{},
 	}
@@ -131,4 +134,54 @@ func (r *Register) tell(clientNum uint8, msg string) {
 	if r.rc != nil {
 		r.rc.Tell(clientNum, msg)
 	}
+}
+
+type playerInfo struct {
+	Name      string
+	GUID      string
+	ClientNum int
+}
+
+func (r *Register) FindPlayer(partial string) *playerInfo {
+	name := strings.ToLower(strings.TrimSpace(partial))
+
+	status, err := r.rc.Status()
+	if err != nil {
+		return nil
+	}
+
+	for _, p := range status.Players {
+		target := strings.ToLower(p.Name)
+
+		if target == name {
+			return &playerInfo{
+				Name:      p.Name,
+				GUID:      p.GUID,
+				ClientNum: p.ClientNum,
+			}
+		}
+
+		if strings.Contains(target, name) {
+			return &playerInfo{
+				Name:      p.Name,
+				GUID:      p.GUID,
+				ClientNum: p.ClientNum,
+			}
+		}
+
+		p, err := r.players.GetPlayerByGUID(p.GUID)
+		if err == nil {
+			cn := r.rc.ClientNumByGUID(p.GUID)
+			if cn == -1 {
+				return nil
+			}
+
+			return &playerInfo{
+				Name:      p.Name,
+				GUID:      p.GUID,
+				ClientNum: cn,
+			}
+		}
+	}
+	return nil
 }
