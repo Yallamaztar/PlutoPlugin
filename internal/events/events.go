@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"plugin/internal/config"
+	"plugin/internal/iw4m"
 	"plugin/internal/logger"
 	"plugin/internal/rcon"
 	"plugin/internal/register"
@@ -21,6 +22,7 @@ func RunEventTailLoop(
 	cfg *config.Config,
 	rcon *rcon.RCON,
 	reg *register.Register,
+	iw4m *iw4m.IW4MWrapper,
 
 	playerService *ps.Service,
 	walletService *ws.Service,
@@ -31,7 +33,7 @@ func RunEventTailLoop(
 	eventsCh := make(chan events.Event, 128)
 	server := cfg.Server[index]
 	go func(cfg *config.Config) {
-		if err := events.TailFileContext(context.Background(), server.LogPath, false, eventsCh); err != nil {
+		if err := events.TailFileContext(context.Background(), server.LogPath, true, eventsCh); err != nil {
 			log.Fatalf("Failed to tail file: %s", server)
 			return
 		}
@@ -71,7 +73,7 @@ func RunEventTailLoop(
 						return
 					}
 
-					id, err := playerService.CreatePlayer(event.Name, event.XUID, guid, 0)
+					id, err := playerService.CreatePlayer(event.Name, event.XUID, guid, 0, cfg, iw4m)
 					if err != nil {
 						return
 					}

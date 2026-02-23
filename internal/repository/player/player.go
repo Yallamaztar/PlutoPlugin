@@ -13,11 +13,12 @@ type Player struct {
 	XUID      string
 	GUID      string
 	Level     int
+	ClientID  *int
 	CreatedAt time.Time
 }
 
 type PlayerRepository interface {
-	Create(name, xuid, guid string, level int) (int, error)
+	Create(name, xuid, guid string, level int, clientID *int) (int, error)
 	GetByID(id int) (*Player, error)
 	GetByXUID(xuid string) (*Player, error)
 	GetByGUID(guid string) (*Player, error)
@@ -38,8 +39,8 @@ func New(db *sql.DB) PlayerRepository {
 	return &repository{db: db}
 }
 
-func (r *repository) Create(name, xuid, guid string, level int) (int, error) {
-	res, err := r.db.Exec(queries.CreatePlayer, name, xuid, guid, level)
+func (r *repository) Create(name, xuid, guid string, level int, clientID *int) (int, error) {
+	res, err := r.db.Exec(queries.CreatePlayer, name, xuid, guid, level, clientID)
 	if err != nil {
 		return 0, err
 	}
@@ -50,7 +51,7 @@ func (r *repository) Create(name, xuid, guid string, level int) (int, error) {
 func (r *repository) GetByID(id int) (*Player, error) {
 	var p Player
 	err := r.db.QueryRow(queries.GetPlayerByID, id).Scan(
-		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.CreatedAt,
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -64,7 +65,7 @@ func (r *repository) GetByID(id int) (*Player, error) {
 func (r *repository) GetByXUID(xuid string) (*Player, error) {
 	var p Player
 	err := r.db.QueryRow(queries.GetPlayerByXUID, xuid).Scan(
-		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.CreatedAt,
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -78,7 +79,7 @@ func (r *repository) GetByXUID(xuid string) (*Player, error) {
 func (r *repository) GetByGUID(guid string) (*Player, error) {
 	var p Player
 	err := r.db.QueryRow(queries.GetPlayerByGUID, guid).Scan(
-		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.CreatedAt,
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

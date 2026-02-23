@@ -5,6 +5,7 @@ import (
 	"plugin/internal/config"
 	"plugin/internal/database"
 	"plugin/internal/events"
+	"plugin/internal/iw4m"
 	"plugin/internal/logger"
 	"plugin/internal/rcon"
 	"plugin/internal/register"
@@ -49,26 +50,32 @@ func main() {
 	walletStats := ss.NewWalletStats(sr.NewWalletStats(db))
 	log.Println("Database migrations done!")
 
+	var iw *iw4m.IW4MWrapper
+	if cfg.IW4MAdmin.Enabled {
+		log.Println("Starting IW4M-Admin integration")
+		iw = iw4m.New(cfg)
+	}
+
 	var wg sync.WaitGroup
 	for i, s := range cfg.Server {
 		serverLog := logger.New(cfg.Server[i].Host)
-		serverLog.Println("Connecting to RCON on " + s.Host)
+		serverLog.Println("Connecting RCON on " + s.Host)
 		rc, err := rcon.New(s.Host, s.Password, cfg)
 		if err != nil {
-			serverLog.Println("Couldnt connect to RCON on " + s.Host)
+			serverLog.Println("Couldnt connect to RCON")
 			continue
 		}
 
 		reg := register.New(*cfg, rc, player)
 		commands.RegisterClientCommands(*cfg, rc, reg, player, wallet, bank, playerStats, gambleStats, walletStats)
 
-		serverLog.Println("Starting Plugin")
+		serverLog.Println("PlutoPlugin started")
 		wg.Add(1)
 		go func(rc *rcon.RCON, log *logger.Logger) {
 			defer wg.Done()
 			defer rc.Close()
 
-			events.RunEventTailLoop(i, cfg, rc, reg, player, wallet, walletStats, log)
+			events.RunEventTailLoop(i, cfg, rc, reg, iw, player, wallet, walletStats, log)
 		}(rc, serverLog)
 	}
 

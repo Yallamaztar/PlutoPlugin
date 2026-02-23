@@ -1,12 +1,12 @@
 package queries
 
 const (
-	CreatePlayer     = `INSERT INTO players (name, xuid, guid, level, created_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);`
+	CreatePlayer     = `INSERT INTO players (name, xuid, guid, level, client_id, created_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);`
 	DeletePlayerByID = `DELETE FROM players WHERE id = ?;`
 
-	GetPlayerByID   = `SELECT id, name, xuid, guid, level, created_at FROM players WHERE id = ?;`
-	GetPlayerByXUID = `SELECT id, name, xuid, guid, level, created_at FROM players WHERE xuid = ?;`
-	GetPlayerByGUID = `SELECT id, name, xuid, guid, level, created_at FROM players WHERE guid = ?;`
+	GetPlayerByID   = `SELECT id, name, xuid, guid, level, client_id, created_at FROM players WHERE id = ?;`
+	GetPlayerByXUID = `SELECT id, name, xuid, guid, level, client_id, created_at FROM players WHERE xuid = ?;`
+	GetPlayerByGUID = `SELECT id, name, xuid, guid, level, client_id, created_at FROM players WHERE guid = ?;`
 
 	GetIDByXUID = `SELECT id FROM players WHERE xuid = ?;`
 	GetIDByGUID = `SELECT id FROM players WHERE guid = ?;`
@@ -18,5 +18,5 @@ const (
 	UserExistsByXUID = `SELECT COUNT(1) FROM players WHERE xuid = ?;`
 	UserExistsByGUID = `SELECT COUNT(1) FROM players WHERE guid = ?;`
 
-	GetAllUsers = `SELECT id, name, xuid, guid, level, created_at FROM players ORDER BY id ASC;`
+	GetAllUsers = `SELECT id, name, xuid, guid, level, client_id, created_at FROM players ORDER BY id ASC;`
 )

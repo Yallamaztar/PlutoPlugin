@@ -2,6 +2,8 @@ package player
 
 import (
 	"fmt"
+	"plugin/internal/config"
+	"plugin/internal/iw4m"
 	"plugin/internal/repository/player"
 )
 
@@ -13,7 +15,7 @@ func New(repo player.PlayerRepository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) CreatePlayer(name, xuid, guid string, level int) (int, error) {
+func (s *Service) CreatePlayer(name, xuid, guid string, level int, cfg *config.Config, iw4m *iw4m.IW4MWrapper) (int, error) {
 	existsXUID, err := s.repo.ExistsByXUID(xuid)
 	if err != nil {
 		return 0, err
@@ -30,7 +32,11 @@ func (s *Service) CreatePlayer(name, xuid, guid string, level int) (int, error) 
 		return 0, fmt.Errorf("player with GUID %s already exists", guid)
 	}
 
-	return s.repo.Create(name, xuid, guid, level)
+	var clientID *int
+	if cfg.IW4MAdmin.Enabled {
+		clientID = iw4m.ClientIDFromGUID(guid)
+	}
+	return s.repo.Create(name, xuid, guid, level, clientID)
 }
 
 func (s *Service) GetPlayerByID(id int) (*player.Player, error) {
