@@ -219,7 +219,38 @@ func RunEventTailLoop(
 			}
 
 			if event.Command == "ShutdownGame" {
-				sessionStats = make(map[string]*session)
+				go func() {
+					status, err := rcon.Status()
+					if err != nil {
+						return
+					}
+
+					if len(status.Players) < 4 {
+						return
+					}
+
+					for _, ps := range status.Players {
+						p, err := playerService.GetPlayerByGUID(ps.GUID)
+						if err != nil {
+							return
+						}
+
+						s, ok := mostvaluable[p.XUID]
+						if !ok {
+							continue
+						}
+
+						cn := rcon.ClientNumByGUID(ps.GUID)
+						if cn == -1 {
+							break
+						}
+
+						reward := int(s / 2)
+
+						walletService.Deposit(p.ID, reward)
+						rcon.Tell(uint8(cn), fmt.Sprintf("You survived the round as MVP and got rewarded: %s%d", cfg.Gambling.Currency, reward))
+					}
+				}()
 			}
 		}
 	}
