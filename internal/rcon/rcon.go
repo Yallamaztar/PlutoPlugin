@@ -3,12 +3,14 @@ package rcon
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"strings"
 	"sync"
 	"time"
 
 	"plugin/internal/config"
+	"plugin/internal/logger"
 )
 
 const (
@@ -40,11 +42,12 @@ type RCON struct {
 	password string
 	config   *config.Config
 
+	log  *logger.Logger
 	conn *net.UDPConn
 	mu   sync.Mutex
 }
 
-func New(host, password string, cfg *config.Config) (*RCON, error) {
+func New(host, password string, cfg *config.Config, log *logger.Logger) (*RCON, error) {
 	addr, err := net.ResolveUDPAddr("udp", host)
 	if err != nil {
 		return nil, errors.New("failed to resolve address")
@@ -60,9 +63,37 @@ func New(host, password string, cfg *config.Config) (*RCON, error) {
 		password: password,
 		config:   cfg,
 
+		log:  log,
 		conn: conn,
 		mu:   sync.Mutex{},
 	}, nil
+}
+
+func (r *RCON) TestConnection() error {
+	attempts := 5
+
+	r.SetDvar("plutoplugin_enabled", "1")
+	for i := 1; i <= attempts; i++ {
+		log.Printf("Attempt %d/%d: Attempting to detect Brownies mod on the server\n", i, attempts)
+
+		r.SetDvar("plutoplugin_in", "plugin_ready")
+		time.Sleep(100 * time.Millisecond)
+
+		d, err := r.GetDvar("plutoplugin_out")
+		if err != nil || d.Value == "" {
+			r.log.Printf("Error reading brwns_exec_out: %v\n", err)
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		if len(d.Value) >= 29 && d.Value[22:29] == "success" {
+			log.Println("PlutoPlugin RCON ready")
+			return nil
+		}
+		time.Sleep(1 * time.Second)
+	}
+
+	return errors.New("PlutoPlugin not found on the server")
 }
 
 func (r *RCON) Close() error {

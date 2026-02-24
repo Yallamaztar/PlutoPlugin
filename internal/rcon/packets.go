@@ -2,7 +2,6 @@ package rcon
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"time"
 )
@@ -65,12 +64,4 @@ func (r *RCON) readResponse() ([]string, error) {
 	}
 
 	return lines, nil
-}
-
-func (r *RCON) TestConnection() error {
-	d, err := r.GetDvar("sv_cheats")
-	if err != nil || d.Value == "" {
-		return errors.New("Failed RCON validation")
-	}
-	return nil
 }

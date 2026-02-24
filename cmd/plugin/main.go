@@ -61,9 +61,15 @@ func main() {
 	for i, s := range cfg.Server {
 		serverLog := logger.New(cfg.Server[i].Host, fmt.Sprintf("pp_server_log_%d.log", i))
 		serverLog.Println("Connecting RCON")
-		rc, err := rcon.New(s.Host, s.Password, cfg)
+
+		rc, err := rcon.New(s.Host, s.Password, cfg, serverLog)
 		if err != nil {
 			serverLog.Println("Couldnt connect to RCON")
+			continue
+		}
+
+		if err = rc.TestConnection(); err != nil {
+			serverLog.Println(err)
 			continue
 		}
 
