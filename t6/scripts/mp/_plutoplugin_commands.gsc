@@ -1,6 +1,40 @@
 #define NOTVALIDERR "One or both target players not found or not alive"
 
-RegisterClientCommand(name, minArgs, handler) {
+/*
+ * RegisterCommands()
+ * registers all commands to the level._commands list
+ * using RegisterCommand() function
+ * RegisterCommand
+ * @name    string   name of the command
+ * @minArgs int      minium amount of arguments required
+ * @handler function the callback function
+*/
+RegisterCommands() {
+    // Server side command for the backend to verify the game is ready
+    RegisterCommand("plugin_ready", 0, ::on_ready);
+
+    // Client commands
+    RegisterCommand("swap",         2, ::swap);
+    RegisterCommand("epilepsy",     2  ::epilepsy);
+    RegisterCommand("killplayer",   2, ::killplayer);
+    RegisterCommand("hideplayer",   2, ::hideplayer);
+    RegisterCommand("teleport",     2, ::teleport);
+    RegisterCommand("setspectator", 2, ::setspectator);
+    RegisterCommand("sayto",        3, ::sayto);
+    RegisterCommand("giveweapon",   3, ::giveweapon);
+    RegisterCommand("takeweapons",  2, ::takeweapons);
+    RegisterCommand("freeze",       2, ::freezeplayer);
+    RegisterCommand("setspeed",     3, ::setspeed);
+    RegisterCommand("slapplayer",   2, ::slapplayer);
+    RegisterCommand("loadout",      3, ::loadout);
+    RegisterCommand("setgravity",   3, ::setgravity);
+    RegisterCommand("dropgun",      2, ::dropgun);
+    RegisterCommand("toggleleft",   0, ::toggleleft);
+    RegisterCommand("bunnyhop",     2, ::bunnyhop);
+    RegisterCommand("jumpheight",   3, ::jumpheight);
+}
+
+RegisterCommand(name, minArgs, handler) {
     if (!IsDefined(level._commands)) {
         level._commands = [];
     }
@@ -36,7 +70,7 @@ ExecCommand(command) {
     if (args.size < def.minArgs) {
         return;
     }
-
+    
     thread [[def.handler]](args);
 }
 
@@ -49,25 +83,13 @@ findPlayerByClientNum(n) {
     return undefined;
 }
 
-/*
- * Command Implementation
- * args params can contain:
- *  - args[0]: origin client number 
- *  - args[1]: target (optional usually)
- *  - args[2]: targe2 (optional usually)
-*/
-
-on_start(args) {
+on_ready(args) {
     scripts\mp\_plutoplugin_utils::SetOutDvar("success");
     wait 0.5;
     scripts\mp\_plutoplugin_utils::ResetOutDvar();
 }
 
 swap(args) {
-    if (args.size < 2) {
-        return;
-    }
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -107,8 +129,6 @@ swap(args) {
 }
 
 epilepsy(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -136,9 +156,7 @@ epilepsy(args) {
     }
 }
 
-kill_player(args) {
-    if (args.size < 2) return;
-
+killplayer(args) {
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -152,9 +170,7 @@ kill_player(args) {
     target IPrintLnBold("You got killed by ^6" + origin.name);
 }
 
-hide_player(args) {
-    if (args.size < 2) return;
-
+hideplayer(args) {
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -189,8 +205,6 @@ hide_player(args) {
 }
 
 teleport(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -218,8 +232,6 @@ teleport(args) {
 }
 
 setspectator(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -234,8 +246,6 @@ setspectator(args) {
 }
 
 sayto(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -244,18 +254,17 @@ sayto(args) {
         return;
     }
 
-    msg = args[1];
+    msg = "";
     for (i = 2; i < args.size; i++) {
-        msg += " " + args[i];
+        if (i > 2) msg += " ";
+        msg += args[i];
     }
 
-    target IPritnLnBold("^6" + origin.name + "^7: " + msg);
+    target IPrintLnBold("^6" + origin.name + "^7: " + msg);
     origin IPrintlnBold("Sent message to ^6" + target.name);
 }
 
 giveweapon(args) {
-    if (args.size < 3) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -275,8 +284,6 @@ giveweapon(args) {
 }
 
 takeweapons(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -290,9 +297,7 @@ takeweapons(args) {
     target IPrintLnBold("^6", origin.name, "^7 took all your weapons");
 }
 
-freeze_player(args) {
-    if (args.size < 2) return;
-
+freezeplayer(args) {
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -327,8 +332,6 @@ freeze_player(args) {
 }
 
 setspeed(args) {
-    if (args.size < 3) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -346,9 +349,7 @@ setspeed(args) {
     }
 }
 
-slap_player(args) {
-    if (args.size < 2) return;
-
+slapplayer(args) {
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -367,8 +368,6 @@ slap_player(args) {
 }
 
 loadout(args) {
-    if (args.size < 3) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -397,9 +396,7 @@ loadout(args) {
     }
 }
 
-set_gravity(args) {
-    if (args.size < 3) return;
-
+setgravity(args) {
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -419,8 +416,6 @@ set_gravity(args) {
 }
 
 dropgun(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -439,8 +434,6 @@ dropgun(args) {
 }
 
 toggleleft(args) {
-    if (args.size < 1) return;
-
     origin = findPlayerByClientNum(args[0]);
     if (!scripts\mp\_plutoplugin_utils::isValidAndAlive(origin)) {
         origin IPrintLnBold("player ^6" + args[1] + "^7 not alive or found");
@@ -461,8 +454,6 @@ toggleleft(args) {
 }
 
 bunnyhop(args) {
-    if (args.size < 2) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
@@ -472,7 +463,11 @@ bunnyhop(args) {
     }
 
     if (!isDefined(target.pers["bunnyhop"])) {
-        target.pers["bunnyhop"] = false;
+        if (GetDvarInt("jump_slowdownEnabled") == 1) {
+            target.pers["bunnyhop"] = false;
+        } else {
+            target.pers["bunnyhop"] = true;
+        }
     }
 
 
@@ -500,8 +495,6 @@ bunnyhop(args) {
 }
 
 jumpheight(args) {
-    if (args.size < 3) return;
-
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
