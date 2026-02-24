@@ -57,9 +57,17 @@ func Gamble(
 			return nil, err
 		}
 
-		_ = playerStats.Win(playerID, bet, bet*2)
-		_ = gambleStats.RecordGamble(bet, bet*2)
-		_ = walletStats.Deposit(playerID, bet)
+		if err := playerStats.Win(playerID, bet, bet*2); err != nil {
+			return nil, err
+		}
+
+		if err := gambleStats.RecordGamble(bet, bet*2); err != nil {
+			return nil, err
+		}
+
+		if err := walletStats.Deposit(playerID, bet); err != nil {
+			return nil, err
+		}
 
 		return &Result{
 			Won:     true,
@@ -77,9 +85,17 @@ func Gamble(
 		return nil, err
 	}
 
-	_ = playerStats.Loss(playerID, bet)
-	_ = gambleStats.RecordGamble(bet, 0)
-	_ = walletStats.Withdraw(playerID, bet)
+	if err := playerStats.Loss(playerID, bet); err != nil {
+		return nil, err
+	}
+
+	if err := gambleStats.RecordGamble(bet, 0); err != nil {
+		return nil, err
+	}
+
+	if err := walletStats.Withdraw(playerID, bet); err != nil {
+		return nil, err
+	}
 
 	return &Result{
 		Won:     false,
