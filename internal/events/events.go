@@ -23,8 +23,7 @@ import (
 var (
 	sessionStats = make(map[string]*session)
 	mostvaluable = make(map[string]int)
-
-	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	rng          = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 type session struct {
@@ -128,7 +127,13 @@ func RunEventTailLoop(
 				continue
 
 			case "Q":
-				go reg.RemoveClientNum(event.XUID)
+				go func() {
+					reg.RemoveClientNum(event.XUID)
+
+					if _, ok := sessionStats[event.XUID]; ok {
+						sessionStats = make(map[string]*session)
+					}
+				}()
 
 			case "say", "sayteam":
 				if cmd, isCommand := strings.CutPrefix(event.Message, server.CommandPrefix); isCommand {
@@ -148,19 +153,48 @@ func RunEventTailLoop(
 					}
 				}
 			}
+
 		case *events.KillEvent:
 			go func() {
+				if event.AttackerXUID == event.VictimXUID {
+					return
+				}
+
 				handleKillEvent(event.AttackerXUID)
 				handleDeathEvent(event.VictimXUID)
 
-				mvp, ok := mostvaluable[event.VictimXUID]
-				if !ok {
-					return
+				attacker, err := playerService.GetPlayerByXUID(event.AttackerXUID)
+				if err != nil {
+					log.Warnf("Failed to get attacker %s: %v", event.AttackerXUID, err)
 				}
-				rcon.Tell(event.AttackerClientNum, fmt.Sprintf("Claimed bounty: %s%d for killing %s", cfg.Gambling.Currency, mvp, event.VictimName))
-				rcon.Say(fmt.Sprintf("%s has killed MVP %s and got rewarded: %s%d", event.AttackerName, event.VictimName, cfg.Gambling.Currency, mvp))
 
-				mostvaluable = make(map[string]int)
+				if err := walletService.Deposit(attacker.ID, cfg.Economy.KillReward); err != nil {
+					log.Warnf("Failed to deposit kill reward for %s: %v", event.AttackerXUID, err)
+
+				}
+
+				victim, err := playerService.GetPlayerByXUID(event.VictimXUID)
+				if err != nil {
+					log.Warnf("Failed to get victim %s: %v", event.VictimXUID, err)
+				}
+
+				if err := walletService.Withdraw(victim.ID, cfg.Economy.DeathPenalty); err != nil {
+					log.Warnf("Failed to withdraw death penalty for %s: %v", event.VictimXUID, err)
+				}
+
+				mvp, ok := mostvaluable[event.VictimXUID]
+				if ok {
+					rcon.Tell(event.AttackerClientNum, fmt.Sprintf(
+						"Claimed bounty: %s%d for killing %s",
+						cfg.Gambling.Currency, mvp, event.VictimName,
+					))
+					rcon.Say(fmt.Sprintf(
+						"%s has killed MVP %s and got rewarded: %s%d",
+						event.AttackerName, event.VictimName, cfg.Gambling.Currency, mvp,
+					))
+
+					mostvaluable = make(map[string]int)
+				}
 			}()
 
 		case *events.ServerEvent:
