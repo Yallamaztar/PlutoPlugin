@@ -32,30 +32,23 @@ func (w *Webhook) SendWebhook(payload payload) {
 		return
 	}
 
-	go func() {
-		webhookQueue <- struct{}{}
-		defer func() {
-			<-webhookQueue
-		}()
+	b, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
 
-		b, err := json.Marshal(payload)
-		if err != nil {
-			return
-		}
+	req, err := http.NewRequest(http.MethodPost, w.URL, bytes.NewReader(b))
+	if err != nil {
+		return
+	}
 
-		req, err := http.NewRequest(http.MethodPost, w.URL, bytes.NewReader(b))
-		if err != nil {
-			return
-		}
+	req.Header.Set("Content-Type", "application/json")
 
-		req.Header.Set("Content-Type", "application/json")
-
-		res, err := client.Do(req)
-		if err != nil {
-			return
-		}
-		defer res.Body.Close()
-	}()
+	res, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
 }
 
 func (w *Webhook) WinWebhook(player string, amount int64) {
