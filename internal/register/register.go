@@ -3,6 +3,7 @@ package register
 import (
 	"fmt"
 	"plugin/internal/config"
+	"plugin/internal/logger"
 	"plugin/internal/rcon"
 	"plugin/internal/service/player"
 	"strings"
@@ -37,11 +38,12 @@ type Register struct {
 	rc      *rcon.RCON
 	cfg     config.Config
 	players *player.Service
+	log     *logger.Logger
 
 	mu sync.RWMutex
 }
 
-func New(cfg config.Config, rc *rcon.RCON, players *player.Service) *Register {
+func New(cfg config.Config, rc *rcon.RCON, players *player.Service, log *logger.Logger) *Register {
 	return &Register{
 		commands: make(commands),
 		clients:  make(clients),
@@ -49,6 +51,7 @@ func New(cfg config.Config, rc *rcon.RCON, players *player.Service) *Register {
 		rc:      rc,
 		cfg:     cfg,
 		players: players,
+		log:     log,
 
 		mu: sync.RWMutex{},
 	}
@@ -66,6 +69,8 @@ func (r *Register) RegisterCommand(cmd Command) {
 	for _, alias := range c.Aliases {
 		r.commands[strings.ToLower(alias)] = &c
 	}
+
+	r.log.Printf("Successfully registered command %s (%v)", c.Name, c.Aliases)
 }
 
 func (r *Register) Execute(

@@ -24,7 +24,7 @@ import (
 )
 
 func main() {
-	log := logger.New("main", "pp_main_log.log")
+	log := logger.New("PlutoPlugin", "pp_main_log.log")
 
 	log.Println("Loading config.yaml")
 	cfg, err := config.Setup(log)
@@ -60,20 +60,24 @@ func main() {
 	var wg sync.WaitGroup
 	for i, s := range cfg.Server {
 		serverLog := logger.New(cfg.Server[i].Host, fmt.Sprintf("pp_server_log_%d.log", i))
-		serverLog.Println("Connecting RCON")
 
+		serverLog.Println("Creating RCON connection")
 		rc, err := rcon.New(s.Host, s.Password, cfg, serverLog)
 		if err != nil {
-			serverLog.Println("Couldnt connect to RCON")
+			serverLog.Errorf("Couldnt connect to RCON")
 			continue
 		}
+		serverLog.Println("Successfully connected to RCON")
 
+		serverLog.Println("Testing GSC connection")
 		if err = rc.TestConnection(); err != nil {
-			serverLog.Println(err)
+			serverLog.Errorln(err)
 			continue
 		}
+		serverLog.Println("Successfully verified GSC connection")
 
-		reg := register.New(*cfg, rc, player)
+		serverLog.Println("Registering commands")
+		reg := register.New(*cfg, rc, player, serverLog)
 		commands.RegisterClientCommands(*cfg, rc, reg, player, wallet, bank, playerStats, gambleStats, walletStats)
 
 		wg.Add(1)

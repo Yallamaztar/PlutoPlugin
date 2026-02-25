@@ -3,7 +3,6 @@ package rcon
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"strings"
 	"sync"
@@ -71,23 +70,25 @@ func New(host, password string, cfg *config.Config, log *logger.Logger) (*RCON, 
 
 func (r *RCON) TestConnection() error {
 	attempts := 5
-
+	println()
 	r.SetDvar("plutoplugin_enabled", "1")
 	for i := 1; i <= attempts; i++ {
-		log.Printf("Attempt %d/%d: Attempting to detect Brownies mod on the server\n", i, attempts)
+		r.log.Infof("Attempt %d/%d: Attempting to connect to PlutoPlugin GSC\n", i, attempts)
 
 		r.SetDvar("plutoplugin_in", "plugin_ready")
 		time.Sleep(100 * time.Millisecond)
 
 		d, err := r.GetDvar("plutoplugin_out")
 		if err != nil || d.Value == "" {
-			r.log.Printf("Error reading brwns_exec_out: %v\n", err)
+			r.log.Warnf("Error reading plutoplugin_out: %v\n", err)
+			println()
 			time.Sleep(1 * time.Second)
 			continue
 		}
 
 		if len(d.Value) >= 29 && d.Value[22:29] == "success" {
-			log.Println("PlutoPlugin RCON ready")
+			r.log.Println("PlutoPlugin RCON ready")
+			println()
 			return nil
 		}
 		time.Sleep(1 * time.Second)
