@@ -23,7 +23,13 @@ import (
 	ws "plugin/internal/service/wallet"
 )
 
+const ascii = `  ╔═╗┬  ┬ ┬┌┬┐┌─┐╔═╗┬  ┬ ┬┌─┐┬┌┐┌
+  ╠═╝│  │ │ │ │ │╠═╝│  │ ││ ┬││││
+  ╩  ┴─┘└─┘ ┴ └─┘╩  ┴─┘└─┘└─┘┴┘└┘
+`
+
 func main() {
+	fmt.Print(ascii)
 	log := logger.New("PlutoPlugin", "pp_main_log.log")
 
 	log.Println("Loading config.yaml")
