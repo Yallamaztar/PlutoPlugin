@@ -38,7 +38,8 @@ type Register struct {
 	rc      *rcon.RCON
 	cfg     config.Config
 	players *player.Service
-	log     *logger.Logger
+
+	log *logger.Logger
 
 	mu sync.RWMutex
 }
