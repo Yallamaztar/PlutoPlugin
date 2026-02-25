@@ -80,7 +80,7 @@ func (r *RCON) TestConnection() error {
 
 		d, err := r.GetDvar("plutoplugin_out")
 		if err != nil || d.Value == "" {
-			r.log.Warnf("Error reading plutoplugin_out: %v\n", err)
+			r.log.Errorf("reading plutoplugin_out: %v\n", err)
 			println()
 			time.Sleep(1 * time.Second)
 			continue
