@@ -25,7 +25,6 @@ type Webhook struct {
 }
 
 var client = &http.Client{Timeout: 2 * time.Second}
-var webhookQueue = make(chan struct{}, 10)
 
 func (w *Webhook) SendWebhook(payload payload) {
 	if w.URL == "" {
