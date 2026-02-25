@@ -144,7 +144,7 @@ func (l *Logger) Errorf(format string, v ...any) {
 }
 
 func (l *Logger) Fatal(v ...any) {
-	l.base.Fatal(append([]any{l.prefix(), levelTag("FATAL")}, v...)...)
+	l.base.Fatal(append([]any{l.prefix(), " " + levelTag("FATAL") + " "}, v...)...)
 }
 
 func (l *Logger) Fatalf(format string, v ...any) {
