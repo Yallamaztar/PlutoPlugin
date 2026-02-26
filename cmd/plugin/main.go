@@ -27,25 +27,16 @@ import (
 	ws "plugin/internal/service/wallet"
 )
 
-func clear() {
+func ascii() {
 	var cmd *exec.Cmd
-
-	switch runtime.GOOS {
-	case "windows":
+	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cmd", "/c", "cls")
-	default: // linux, darwin (macOS), etc.
+	} else {
 		cmd = exec.Command("clear")
 	}
-
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error clearing screen:", err)
-	}
-}
-
-func asciiArt() {
-	clear()
+	_ = cmd.Run()
 
 	banner := []string{
 		"   ____  _       _        ____  _             _       ",
@@ -68,7 +59,7 @@ func asciiArt() {
 	fmt.Print("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
 }
 func main() {
-	asciiArt()
+	ascii()
 
 	log := logger.New("PlutoPlugin", "pp_main_log.log")
 	log.Println("Loading config.yaml")
@@ -106,6 +97,9 @@ func main() {
 		wh = webhook.New(cfg.Discord.WebhookLink)
 	}
 
+	// single IW4M-Admin wrapper instance cause the plugin only uses commands
+	// like: !setlevel, !ban, !unban which are "global" commands, so handling
+	// different server ids is pointless
 	var iw *iw4m.IW4MWrapper
 	if cfg.IW4MAdmin.Enabled {
 		log.Println("Starting IW4M-Admin integration")
