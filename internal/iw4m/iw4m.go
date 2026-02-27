@@ -6,34 +6,38 @@ import (
 	"net/http"
 	"net/url"
 	"plugin/internal/config"
+	"plugin/internal/logger"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type IW4MWrapper struct {
-	host     string
+	Host     string
 	serverID int64
 	cookie   string
 
+	log    *logger.Logger
 	config *config.Config
 	client *http.Client
 }
 
-func New(config *config.Config) *IW4MWrapper {
+func New(config *config.Config, log *logger.Logger) *IW4MWrapper {
+	// making sure end of URL doesnt have a "/"
+	host := strings.TrimRight(config.IW4MAdmin.Host, "/")
 	return &IW4MWrapper{
-		host:     config.IW4MAdmin.Host,
+		Host:     host,
 		serverID: config.IW4MAdmin.ServerID,
 		cookie:   config.IW4MAdmin.Cookie,
 
+		log:    log,
 		config: config,
-		client: &http.Client{
-			Timeout: 5 * time.Second,
-		},
+		client: &http.Client{Timeout: 5 * time.Second},
 	}
 }
 
 func (w *IW4MWrapper) do(endpoint string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, w.host+"/"+endpoint, nil)
+	req, err := http.NewRequest(http.MethodGet, w.Host+"/"+endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +81,7 @@ type findClient struct {
 
 func (w *IW4MWrapper) ClientIDFromGUID(guid string) *int {
 	endpoint := fmt.Sprintf(
-		"/api/client/find?name=&guid=%s&count=10&offset=0&direction=0",
+		"api/client/find?name=&guid=%s&count=10&offset=0&direction=0",
 		url.QueryEscape(guid),
 	)
 
@@ -116,7 +120,7 @@ type stats struct {
 }
 
 func (w *IW4MWrapper) Stats(clientID, index int) (*stats, error) {
-	endpoint := fmt.Sprintf("/api/stats/%d", clientID)
+	endpoint := fmt.Sprintf("api/stats/%d", clientID)
 
 	res, err := w.do(endpoint)
 	if err != nil {
@@ -138,4 +142,26 @@ func (w *IW4MWrapper) Stats(clientID, index int) (*stats, error) {
 	}
 
 	return &statList[index], nil
+}
+
+func (w *IW4MWrapper) TestConnection() error {
+	for i := range 5 {
+		w.log.Infof("Attempt %d/5: Attempting to connect to IW4M-Admin\n", i+1)
+
+		stat, err := w.Stats(2, 0)
+		if err != nil {
+			w.log.Errorf("couldn't connect to IW4M-Admin: %v", err)
+			time.Sleep(500 * time.Millisecond)
+			continue
+		}
+
+		if stat == nil || stat.Name == "" {
+			time.Sleep(500 * time.Millisecond)
+			continue
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf("couldn't connect to IW4M-Admin (%s)", w.Host)
 }
