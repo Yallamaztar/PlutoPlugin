@@ -69,11 +69,10 @@ func New(host, password string, cfg *config.Config, log *logger.Logger) (*RCON, 
 }
 
 func (r *RCON) TestConnection() error {
-	attempts := 5
 	println()
 	r.SetDvar("plutoplugin_enabled", "1")
-	for i := 1; i <= attempts; i++ {
-		r.log.Infof("Attempt %d/%d: Attempting to connect to PlutoPlugin GSC\n", i, attempts)
+	for i := range 5 {
+		r.log.Infof("Attempt %d/5: Attempting to connect to PlutoPlugin GSC\n", i)
 
 		r.SetDvar("plutoplugin_in", "plugin_ready")
 		time.Sleep(100 * time.Millisecond)
@@ -82,7 +81,7 @@ func (r *RCON) TestConnection() error {
 		if err != nil || d.Value == "" {
 			r.log.Errorf("reading plutoplugin_out: %v\n", err)
 			println()
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 			continue
 		}
 
@@ -91,7 +90,7 @@ func (r *RCON) TestConnection() error {
 			println()
 			return nil
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	return errors.New("PlutoPlugin not found on the server")
