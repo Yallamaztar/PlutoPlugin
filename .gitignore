@@ -3,4 +3,5 @@
 *.exe
 *.log
 internal/commands/game
-t6/scripts/mp/*bots*
+t6/scripts/mp/*_bots*
+scripts/compiled
