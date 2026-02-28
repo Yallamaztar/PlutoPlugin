@@ -197,8 +197,7 @@ hideplayer(args) {
         target.is_hidden = true;
         origin IPrintLnBold("Hidden ^5" + target.name);
 
-        // if origin.guid != target.guid also alert target
-        if origin.guid != target.guid {
+        if (origin.guid != target.guid) {
             target IPrintLnBold("^6" + origin.name + "^7 hid you");
         }
     } else {
@@ -206,8 +205,7 @@ hideplayer(args) {
         target.is_hidden = false;
         origin IPrintLnBold("Unhidden ^6" + target.name);
 
-        // if origin.guid != target.guid also alert target
-        if origin.guid != target.guid {
+        if (origin.guid != target.guid) {
             target IPrintLnBold("^6" + origin.name + "^7 unhid you");
         }
     }
@@ -244,7 +242,7 @@ setspectator(args) {
     origin = findPlayerByClientNum(args[0]);
     target = findPlayerByClientNum(args[1]);
 
-    if (!scripts\mp\_plutoplugin_utils::isValidAndAlive(target) || target.pers["team"] == spectator) {
+    if (!scripts\mp\_plutoplugin_utils::isValidAndAlive(target) || target.pers["team"] == "spectator") {
         origin IPrintLnBold("player ^6" + args[1] + "^7 already in spectator, or not found / alive");
         return;
     }
@@ -287,7 +285,7 @@ giveweapon(args) {
     target SwitchToWeapon(weapon);
 
     origin IPrintLnBold("Gave ^6" + target.name + "^7 " + weapon);
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 gave you weapon: ^6" + weapon);
     }
 }
@@ -324,8 +322,7 @@ freezeplayer(args) {
         target.is_frozen = true;
         origin IPrintLnBold("Frozen ^6" + target.name);
 
-        // if origin.guid != target.guid also alert target
-        if origin.guid != target.guid {
+        if (origin.guid != target.guid) {
             target IPrintLnBold("^6" + origin.name + "^7 froze you");
         }
     } else {
@@ -333,8 +330,7 @@ freezeplayer(args) {
         target.is_frozen = false;
         origin IPrintLnBold("Unfroze ^6" + target.name);
 
-        // if origin.guid != target.guid also alert target
-        if origin.guid != target.guid {
+        if (origin.guid != target.guid) {
             target IPrintLnBold("^6" + origin.name + "^7 unfroze you");
         }
     }
@@ -353,7 +349,7 @@ setspeed(args) {
     target SetMoveSpeedScale(speed);
 
     origin IPrintLnBold("Set ^6" + target.name + "^7 speed to ^6" + speed);
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 set your speed to ^6" + speed);
     }
 }
@@ -368,10 +364,10 @@ slapplayer(args) {
     }
 
     vel = (RandomInt(400) - 100, RandomInt(700) - 100, 200);
-    target SetVelocity(vel)
+    target SetVelocity(vel);
 
     origin IPrintLnBold("Slapped ^6" + target.name);
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 slapped you");
     }
 }
@@ -400,7 +396,7 @@ loadout(args) {
     target SwitchToWeapon(weapon);
 
     origin IPrintLnBold("Gave ^6" + target.name + "^7 " + weapon);
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 gave you weapon " + weapon);
     }
 }
@@ -419,7 +415,7 @@ setgravity(args) {
     target SetClientDvar("bg_gravity", gravity);
 
     origin IPrintLnBold("Set ^6" + target.name + "^7 gravity to: ^6" + gravity);
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 set your gravity to: ^6" + gravity);
     }
 }
@@ -437,7 +433,7 @@ dropgun(args) {
     target DropItem(weapon);
 
     origin IPrintLnBold("Dropped ^6" + target.name + "^7 weapon");
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 dropped your weapon");
     }
 }
@@ -487,7 +483,7 @@ bunnyhop(args) {
         target.pers["bunnyhop"] = true;
 
         origin IPrintLnBold("Bunnyhop enabled for ^6" + target.name);
-        if origin.guid != target.guid {
+        if (origin.guid != target.guid) {
             target IPrintLnBold("^6" + origin.name + "^7 enabled bunnyhop for you");
         }
 
@@ -497,7 +493,7 @@ bunnyhop(args) {
         target SetClientDvar("sv_cheats", 0);
 
         origin IPrintLnBold("Bunnyhop disabled for ^6" + target.name);
-        if origin.guid != target.guid {
+        if (origin.guid != target.guid) {
             target IPrintLnBold("^6" + origin.name + "^7 disabled bunnyhop for you");
         }
     }
@@ -518,7 +514,7 @@ jumpheight(args) {
     target SetClientDvar("sv_cheats", 0);
 
     origin IPrintLnBold("set ^6" + target.name + "^7 jump height to ^6" + height);
-    if origin.guid != target.guid {
+    if (origin.guid != target.guid) {
         target IPrintLnBold("^6" + origin.name + "^7 set your jump height to ^6" + height);
     }
 }

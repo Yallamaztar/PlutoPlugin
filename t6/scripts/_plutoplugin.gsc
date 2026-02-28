@@ -17,13 +17,13 @@ inDvarListener() {
     level endon("game_ended");
     for(;;) {
         if (GetDvarInt(level._dvars.enabled) != 1) {
-            wait 0.1;
+            wait 0.5;
             continue;
         }
 
-        cmd = scripts\mp\_plutoplugin_utils::GetInDvar()
+        cmd = scripts\mp\_plutoplugin_utils::GetInDvar();
         if (cmd != "") {
-            scripts\mp\_plutoplugin_utils::SetInDvar("");
+            scripts\mp\_plutoplugin_utils::SetInDvar(level._dvars.reset);
             thread scripts\mp\_plutoplugin_commands::ExecCommand(cmd);
         }
 
