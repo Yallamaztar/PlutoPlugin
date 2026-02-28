@@ -68,6 +68,7 @@ func promptDiscord() Discord {
 			Enabled:     true,
 			WebhookLink: readLine(reader, "Enter Discord webhook link: "),
 			InviteLink:  readLine(reader, "Enter Discord invite link (optional): "),
+			BotToken:    readLine(reader, "Enter Discord bot token: "),
 		}
 	}
 	return Discord{}

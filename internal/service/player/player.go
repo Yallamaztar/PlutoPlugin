@@ -60,6 +60,11 @@ func (s *Service) GetDiscordIDByID(id int) (string, error) {
 
 	return d, err
 }
+
+func (s *Service) GetPlayerByDiscordID(id string) (*player.Player, error) {
+	return s.repo.GetPlayerByDiscordID(id)
+}
+
 func (s *Service) UpdateDiscordID(id int, discordID string) error {
 	if discordID == "" {
 		return errors.New("discordID cannot be empty")

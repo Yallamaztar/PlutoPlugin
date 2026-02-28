@@ -48,6 +48,7 @@ type Discord struct {
 	Enabled     bool   `yaml:"enabled"`
 	InviteLink  string `yaml:"invite_link"`
 	WebhookLink string `yaml:"webhook_link"`
+	BotToken    string `yaml:"bot_token"`
 }
 
 type IW4MAdmin struct {

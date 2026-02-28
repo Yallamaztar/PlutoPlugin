@@ -14,6 +14,7 @@ type Player struct {
 	GUID      string
 	Level     int
 	ClientID  *int
+	DiscordID *string
 	CreatedAt time.Time
 }
 
@@ -23,6 +24,7 @@ type PlayerRepository interface {
 	GetByXUID(xuid string) (*Player, error)
 	GetByGUID(guid string) (*Player, error)
 	GetDiscordIDByID(id int) (string, error)
+	GetPlayerByDiscordID(id string) (*Player, error)
 	UpdateDiscordID(id int, discordID string) error
 	UpdateName(id int, name string) error
 	UpdateLevel(id int, level int) error
@@ -53,7 +55,7 @@ func (r *repository) Create(name, xuid, guid string, level int, clientID *int) (
 func (r *repository) GetByID(id int) (*Player, error) {
 	var p Player
 	err := r.db.QueryRow(queries.GetPlayerByID, id).Scan(
-		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.CreatedAt,
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.DiscordID, &p.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -67,7 +69,7 @@ func (r *repository) GetByID(id int) (*Player, error) {
 func (r *repository) GetByXUID(xuid string) (*Player, error) {
 	var p Player
 	err := r.db.QueryRow(queries.GetPlayerByXUID, xuid).Scan(
-		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.CreatedAt,
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.DiscordID, &p.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -81,7 +83,7 @@ func (r *repository) GetByXUID(xuid string) (*Player, error) {
 func (r *repository) GetByGUID(guid string) (*Player, error) {
 	var p Player
 	err := r.db.QueryRow(queries.GetPlayerByGUID, guid).Scan(
-		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.CreatedAt,
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.DiscordID, &p.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -107,6 +109,18 @@ func (r *repository) GetDiscordIDByXUID(xuid string) (string, error) {
 		return "", err
 	}
 	return discorID, nil
+}
+
+func (r *repository) GetPlayerByDiscordID(id string) (*Player, error) {
+	var p Player
+	err := r.db.QueryRow(queries.GetPlayerByDiscordID, id).Scan(
+		&p.ID, &p.Name, &p.XUID, &p.GUID, &p.Level, &p.ClientID, &p.DiscordID, &p.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &p, nil
 }
 
 func (r *repository) UpdateDiscordID(id int, discordID string) error {

@@ -4,9 +4,10 @@ const (
 	CreatePlayer     = `INSERT INTO players (name, xuid, guid, level, client_id, discord_id, created_at) VALUES (?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP);`
 	DeletePlayerByID = `DELETE FROM players WHERE id = ?;`
 
-	GetPlayerByID   = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE id = ?;`
-	GetPlayerByXUID = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE xuid = ?;`
-	GetPlayerByGUID = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE guid = ?;`
+	GetPlayerByID        = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE id = ?;`
+	GetPlayerByXUID      = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE xuid = ?;`
+	GetPlayerByGUID      = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE guid = ?;`
+	GetPlayerByDiscordID = `SELECT id, name, xuid, guid, level, client_id, discord_id, created_at FROM players WHERE discord_id = ?;`
 
 	GetDiscordIDByID   = `SELECT discord_id FROM players WHERE id = ?;`
 	GetDiscordIDByXUID = `SELECT discord_id FROM players WHERE xuid = ?;`

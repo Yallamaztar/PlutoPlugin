@@ -7,6 +7,7 @@ import (
 	"plugin/internal/commands"
 	"plugin/internal/config"
 	"plugin/internal/database"
+	"plugin/internal/discord/bot"
 	"plugin/internal/discord/webhook"
 	"plugin/internal/events"
 	"plugin/internal/iw4m"
@@ -95,10 +96,30 @@ func main() {
 
 	var wh *webhook.Webhook
 	if cfg.Discord.Enabled {
+		println()
+		log.Println("Starting Discord integrations")
+
 		if cfg.Discord.WebhookLink == "" {
 			log.Fatalf("Your discord webhook link is empty, please create one and add it to the config")
 		}
 		wh = webhook.New(cfg.Discord.WebhookLink)
+
+		if cfg.Discord.BotToken == "" {
+			log.Fatalf("Discord bot token is empty")
+		}
+		discordBot, err := bot.New(cfg, log, player, wallet, walletStats, link, wh)
+		if err != nil {
+			log.Fatalf("Failed to create discord bot: %v\n", err)
+		}
+
+		go func() {
+			if err := discordBot.Start(); err != nil {
+				log.Fatalf("Failed to start discord bot: %v\n", err)
+			}
+		}()
+
+		defer discordBot.Close()
+		log.Infof("Successfully started discord bot")
 	}
 
 	// single IW4M-Admin wrapper instance cause the plugin only uses commands
