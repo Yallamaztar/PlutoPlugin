@@ -5,14 +5,28 @@ init() {
     level._dvars.outDvar = "plutoplugin_out";
     level._dvars.reset   = "";
 
-    level._commnads = [];
-    level._command_prefix  = "!";
+    level._commands = [];
+    level._command_prefix  = ;
 
     scripts\mp\_plutoplugin_utils::SetDvarIfUnitialized(level._dvars.enabled, 1);
-    scripts\mp\_plutoplugin_utils::SetDvarIfUnitialized(level._dvars.inDvar, "");
-    scripts\mp\_plutoplugin_utils::SetDvarIfUnitialized(level._dvars.inDvar, "");
-
-    EnableDvarChangedNotify(level._dvars.enabled);
-    EnableDvarChangedNotify(level._dvars.inDvar);
+    scripts\mp\_plutoplugin_utils::SetDvarIfUnitialized(level._dvars.inDvar,  "");
+    scripts\mp\_plutoplugin_utils::SetDvarIfUnitialized(level._dvars.outDvar, "");
 }
 
+inDvarListener() {
+    level endon("game_ended");
+    for(;;) {
+        if (GetDvarInt(level._dvars.enabled) != 1) {
+            wait 0.5;
+            continue;
+        }
+
+        cmd = scripts\mp\_plutoplugin_utils::GetInDvar()
+        if (cmd != "") {
+            scripts\mp\_plutoplugin_utils::SetInDvar("");
+            thread scripts\mp\_plutoplugin_commands::ExecCommand(cmd);
+        }
+
+        wait 0.01;
+    }
+}

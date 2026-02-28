@@ -4,6 +4,15 @@ SetDvarIfUnitialized(dvar, value) {
     }
 }
 
+GetDvarDefault(dvar, def) {
+    d = getDvar(dvar);
+    if (d != "") {
+        return d;
+    }
+
+    return def;
+}
+
 isValidAndAlive(target) {
     return !isDefined(target) || IsAlive(target);
 }
