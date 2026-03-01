@@ -5,7 +5,6 @@
 a modular server management and plugin framework for **Call of Duty: Black Ops II [(Plutonium T6)](https://plutonium.pw/)**
 It aims to provide a flexible foundation for economy systems, administrative tools, and third-party **integrations, including Discord and [IW4M-Admin](https://github.com/RaidMax/IW4M-Admin)**
 
-
 | This project is work in progress
 
 ## Features
@@ -30,6 +29,8 @@ It aims to provide a flexible foundation for economy systems, administrative too
     - Ban management
     - Administrative actions
     - Session-based & performance-based rewards
+    
+    **For help with IW4M-Admin integration [click here](https://github.com/Yallamaztar/iw4m?tab=readme-ov-file#setting-up-iw4m)**
 
 ---
 
@@ -55,9 +56,8 @@ It aims to provide a flexible foundation for economy systems, administrative too
 ---
 
 ### TODO:
-- Add GSC integrations
-- Add better logging
 - Finish all command implementations
+- Finish discord bot
 - Improve event handling
 - Documentation & examples
 - Add custom bots (maybe)
