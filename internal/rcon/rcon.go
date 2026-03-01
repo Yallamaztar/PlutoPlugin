@@ -196,6 +196,14 @@ func (r *RCON) SetDvar(dvar, value string) {
 	_ = r.sendPacket(packet)
 }
 
+func (r *RCON) SetInDvar(value string) {
+	if strings.ContainsAny(value, " \t\"") {
+		value = fmt.Sprintf("\"%s\"", strings.ReplaceAll(value, "\"", "\\\""))
+	}
+
+	r.SetDvar("plutoplugin_in", value)
+}
+
 func (r *RCON) GetDvar(dvar string) (*Dvar, error) {
 	if dvar == "" {
 		return nil, fmt.Errorf("dvar cannot be empty")
