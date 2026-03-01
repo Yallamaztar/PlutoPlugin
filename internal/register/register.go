@@ -36,7 +36,7 @@ type Register struct {
 	clients  clients
 
 	rc      *rcon.RCON
-	cfg     config.Config
+	cfg     *config.Config
 	players *player.Service
 
 	log *logger.Logger
@@ -44,7 +44,7 @@ type Register struct {
 	mu sync.RWMutex
 }
 
-func New(cfg config.Config, rc *rcon.RCON, players *player.Service, log *logger.Logger) *Register {
+func New(cfg *config.Config, rc *rcon.RCON, players *player.Service, log *logger.Logger) *Register {
 	return &Register{
 		commands: make(commands),
 		clients:  make(clients),

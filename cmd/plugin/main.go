@@ -43,12 +43,12 @@ func ascii() {
 
 	// hacker ascii art type shi
 	banner := []string{
-		"   ____  _       _        ____  _             _       ",
-		"  |  _ \\| |_   _| |_ ___ |  _ \\| |_   _  __ _(_)_ __  ",
-		"  | |_) | | | | | __/ _ \\| |_) | | | | |/ _` | | '_ \\ ",
+		"   ____  _       _        ____  _             _",
+		"  |  _ \\| |_   _| |_ ___ |  _ \\| |_   _  __ _(_)_ __ ",
+		"  | |_) | | | | | __/ _ \\| |_) | | | | |/ _` | | '_ \\",
 		"  |  __/| | |_| | || (_) |  __/| | |_| | (_| | | | | |",
 		"  |_|   |_|\\__,_|\\__\\___/|_|   |_|\\__,_|\\__, |_|_| |_|",
-		"                                        |___/         ",
+		"                                        |___/",
 	}
 
 	lines := len(banner)
@@ -162,8 +162,8 @@ func main() {
 		serverLog.Println("Successfully verified GSC connection")
 
 		serverLog.Println("Registering commands")
-		reg := register.New(*cfg, rc, player, serverLog)
-		commands.RegisterClientCommands(*cfg, rc, reg, player, wallet, bank, link, playerStats, gambleStats, walletStats, wh)
+		reg := register.New(cfg, rc, player, serverLog)
+		commands.RegisterClientCommands(cfg, rc, reg, player, wallet, bank, link, playerStats, gambleStats, walletStats, wh)
 
 		wg.Add(1)
 		go func(rc *rcon.RCON, log *logger.Logger) {

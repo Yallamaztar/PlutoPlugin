@@ -24,7 +24,7 @@ func Pay(
 	toPlayerID int,
 	amount int,
 
-	cfg config.Config,
+	cfg *config.Config,
 	player *player.Service,
 	wallet *wallet.Service,
 	walletStats *stats.WalletStatsService,

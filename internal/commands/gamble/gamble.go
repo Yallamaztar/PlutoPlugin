@@ -26,7 +26,7 @@ func Gamble(
 	playerName string,
 	amount int,
 
-	cfg config.Config,
+	cfg *config.Config,
 	player *player.Service,
 	wallet *wallet.Service,
 	bank *bank.Service,

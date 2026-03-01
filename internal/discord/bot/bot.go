@@ -149,7 +149,7 @@ func (b *Bot) handlePay(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	_, err = pay.Pay(fromPlayer.ID, toPlayer.ID, amount, *b.cfg, b.player, b.wallet, b.walletStats, b.webhook)
+	_, err = pay.Pay(fromPlayer.ID, toPlayer.ID, amount, b.cfg, b.player, b.wallet, b.walletStats, b.webhook)
 	if err != nil {
 		respondEphemeral(s, i, "❌ "+err.Error())
 		return
